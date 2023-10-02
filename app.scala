@@ -5,7 +5,6 @@ import com.comcast.ip4s.*
 import org.http4s.HttpRoutes
 import org.http4s.dsl.Http4sDsl
 import org.http4s.ember.server.EmberServerBuilder
-import epollcat.EpollApp
 
 class HttpApp[F[_]: Monad] extends Http4sDsl[F] {
 
@@ -17,7 +16,7 @@ class HttpApp[F[_]: Monad] extends Http4sDsl[F] {
 
 }
 
-object Main extends EpollApp.Simple {
+object Main extends IOApp.Simple {
 
   val h = host"localhost"
   val p = port"8080"
