@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-scala-cli package . -o app --java-home "$JAVA_HOME"
+scala-cli --power package . -o app --java-home "$JAVA_HOME"
