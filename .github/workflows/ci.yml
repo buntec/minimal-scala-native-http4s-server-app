@@ -32,7 +32,7 @@ jobs:
         run: |
           nix develop --command ./package.sh
       - name: Release
-          uses: softprops/action-gh-release@v1
-          with:
-            files: |
-              app
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            app
