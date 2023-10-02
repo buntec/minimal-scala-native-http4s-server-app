@@ -34,9 +34,18 @@ jobs:
         with:
           fail-mode: true
 
+      - name: Cache maven artifacts
+        uses: actions/cache@v3
+        with:
+          key: ${{ matrix.os }}-coursier-cache
+          path: |
+            ./coursier-cache
+
       - name: Build
         run: |
-          nix develop --command ./package.sh
+          nix develop --command ./package-ci.sh
+      - name: Compress
+        run: |
           tar czf "app-${{ matrix.release_suffix }}.tar.gz" app
       - name: Release
         if: startsWith(github.ref, 'refs/tags/v')
