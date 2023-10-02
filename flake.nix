@@ -17,7 +17,7 @@
 
           overlays = [ devshell.overlays.default ];
         };
-        jdk = pkgs.jdk17;
+        jdk = pkgs.jdk17_headless;
       in pkgs.devshell.mkShell {
         name = "scala-native-http4s-dev-shell";
         commands = [
