@@ -22,7 +22,7 @@ jobs:
         include:
           - os: ubuntu-latest
             release_suffix: linux
-          - os: macos-latest
+          - os: macos-13
             release_suffix: macos
 
     runs-on: ${{ matrix.os }}
