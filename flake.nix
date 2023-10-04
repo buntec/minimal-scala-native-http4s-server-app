@@ -22,7 +22,14 @@
         name = "scala-native-http4s-dev-shell";
         commands = [
           { package = pkgs.metals.override { jre = jdk; }; }
-          { package = pkgs.scala-cli; }
+          {
+            name = "sc";
+            command = ''
+              scala-cli "$@" --java-home=$JAVA_HOME
+            '';
+            help =
+              "Wrapper around scala-cli, passing the correct jdk via --java-home";
+          }
           { package = pkgs.sbt.override { jre = jdk; }; }
         ];
 
