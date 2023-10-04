@@ -76,11 +76,11 @@
         };
 
         apps.default = let
-          # fixed-output derivation
+          # fixed-output derivation: to nix'ify scala-cli,
+          # we must hash the coursier caches created during the build
           app = let
-            deps = pkgs.stdenv.mkDerivation {
-              pname = "app-deps";
-              version = "0.0.6";
+            coursier-cache = pkgs.stdenv.mkDerivation {
+              name = "coursier-cache";
               src = ./src;
 
               buildInputs = packages;
@@ -89,41 +89,40 @@
               COURSIER_ARCHIVE_CACHE = "./coursier-cache/arc";
               COURSIER_JVM_CACHE = "./coursier-cache/jvm";
 
-              # run the same build as our main derivation to ensure we capture the correct set of dependencies
+              # run the same build as our main derivation
+              # to populate the cache with the correct set of dependencies
               buildPhase = ''
                 mkdir -p coursier-cache/v1
                 mkdir -p coursier-cache/arc
                 mkdir -p coursier-cache/jvm
-                scala-cli compile . --scala=3 --java-home=${jdk} --server=false
+                scala-cli compile . --java-home=${jdk} --server=false
               '';
 
-              # take the cached dependencies and convert them into a maven repo structure
               installPhase = ''
                 mkdir -p $out/coursier-cache
                 cp -R ./coursier-cache $out
               '';
 
-              # specify the content hash of this derivations output
               outputHashAlgo = "sha256";
               outputHashMode = "recursive";
               outputHash =
-                "sha256-i3xTBHGfa7W3spBYhFTkW1kT1VxnGQnmGFQrSO08XQc=";
+                "sha256-yuhZnsrWQOuHk64st4aasRAdDJV3rgRyS5sO0zMMlS8=";
             };
+
           in pkgs.stdenv.mkDerivation {
             name = "app";
 
             src = ./src;
 
-            buildInputs = packages ++ [ deps ];
+            buildInputs = packages ++ [ coursier-cache ];
 
             JAVA_HOME = "${jdk.outPath}";
-            COURSIER_CACHE = "${deps}/coursier-cache/v1";
-            COURSIER_ARCHIVE_CACHE = "${deps}/coursier-cache/arc";
-            COURSIER_JVM_CACHE = "${deps}/coursier-cache/jvm";
+            COURSIER_CACHE = "${coursier-cache}/coursier-cache/v1";
+            COURSIER_ARCHIVE_CACHE = "${coursier-cache}/coursier-cache/arc";
+            COURSIER_JVM_CACHE = "${coursier-cache}/coursier-cache/jvm";
 
             buildPhase = ''
-              ls -la ${deps}/coursier-cache
-              scala-cli --power package . -o app --scala=3 --java-home=${jdk} --server=false
+              scala-cli --power package . -o app --java-home=${jdk} --server=false
             '';
 
             installPhase = ''
@@ -131,6 +130,7 @@
               cp app $out/bin
             '';
           };
+
         in {
           type = "app";
           program = "${app}/bin/app";

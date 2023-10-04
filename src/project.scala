@@ -1,3 +1,4 @@
+//> using scala 3.3.1
 //> using platform native
 //> using nativeVersion 0.4.15
 //> using toolkit typelevel:latest
