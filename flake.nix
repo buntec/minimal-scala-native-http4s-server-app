@@ -11,6 +11,7 @@
 
   outputs = { self, flake-utils, devshell, nixpkgs, ... }:
     flake-utils.lib.eachDefaultSystem (system: {
+
       devShell = let
         pkgs = import nixpkgs {
           inherit system;
@@ -63,5 +64,28 @@
           }
         ];
       };
+
+      apps.default = let
+        pkgs = import nixpkgs { inherit system; };
+        app = pkgs.stdenv.mkDerivation {
+          name = "app";
+          src = ./src;
+          buildPhase = ''
+            scala-cli --power package . \
+              -o app \
+              --java-home "$JAVA_HOME" \
+              --native-linking "-static-libstdc++"
+          '';
+          installPhase = ''
+            mkdir -p $out/bin
+            cp app $out/bin
+          '';
+
+        };
+      in {
+        type = "app";
+        program = "${app}/bin/app";
+      };
+
     });
 }
