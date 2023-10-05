@@ -21,20 +21,18 @@
         jdk = pkgs.jdk17_headless;
         sbt = pkgs.sbt.override { jre = jdk; };
         metals = pkgs.metals.override { jre = jdk; };
+        scala-cli = pkgs.scala-cli.override { jre = jdk; };
 
-        packages = [
+        build-packages = [
           jdk
-          sbt
-          metals
-          pkgs.s2n
-          pkgs.zlib
-          pkgs.s2n-tls
-          pkgs.openssl
+          scala-cli
           pkgs.clang
-          pkgs.llvmPackages.libcxxabi
           pkgs.coreutils
-          pkgs.scala-cli
+          pkgs.llvmPackages.libcxxabi
+          pkgs.openssl
+          pkgs.s2n-tls
           pkgs.which
+          pkgs.zlib
         ];
 
         # fixed-output derivation: to nix'ify scala-cli,
@@ -44,7 +42,7 @@
             name = "coursier-cache";
             src = ./src;
 
-            buildInputs = packages;
+            buildInputs = build-packages;
 
             SCALA_CLI_HOME = "./scala-cli-home";
             COURSIER_CACHE = "./coursier-cache/v1";
@@ -74,7 +72,7 @@
         in pkgs.stdenv.mkDerivation {
           name = "app";
           src = ./src;
-          buildInputs = packages ++ [ coursier-cache ];
+          buildInputs = build-packages ++ [ coursier-cache ];
 
           JAVA_HOME = "${jdk}";
           SCALA_CLI_HOME = "./scala-cli-home";
@@ -107,7 +105,7 @@
             { package = sbt; }
           ];
 
-          packages = packages;
+          packages = build-packages ++ [ sbt metals ];
 
           env = [
             {
