@@ -85,6 +85,7 @@
 
               buildInputs = packages;
 
+              SCALA_CLI_HOME = "./scala-cli-home";
               COURSIER_CACHE = "./coursier-cache/v1";
               COURSIER_ARCHIVE_CACHE = "./coursier-cache/arc";
               COURSIER_JVM_CACHE = "./coursier-cache/jvm";
@@ -92,6 +93,7 @@
               # run the same build as our main derivation
               # to populate the cache with the correct set of dependencies
               buildPhase = ''
+                mkdir scala-cli-home
                 mkdir -p coursier-cache/v1
                 mkdir -p coursier-cache/arc
                 mkdir -p coursier-cache/jvm
@@ -106,7 +108,7 @@
               outputHashAlgo = "sha256";
               outputHashMode = "recursive";
               outputHash =
-                "sha256-yuhZnsrWQOuHk64st4aasRAdDJV3rgRyS5sO0zMMlS8=";
+                "sha256-LSlYKxsF9RrQrcRh/CgBGATYxEVEMa6j+th5NjxYvww=";
             };
 
           in pkgs.stdenv.mkDerivation {
@@ -117,11 +119,13 @@
             buildInputs = packages ++ [ coursier-cache ];
 
             JAVA_HOME = "${jdk.outPath}";
+            SCALA_CLI_HOME = "./scala-cli-home";
             COURSIER_CACHE = "${coursier-cache}/coursier-cache/v1";
             COURSIER_ARCHIVE_CACHE = "${coursier-cache}/coursier-cache/arc";
             COURSIER_JVM_CACHE = "${coursier-cache}/coursier-cache/jvm";
 
             buildPhase = ''
+              mkdir scala-cli-home
               scala-cli --power package . -o app --java-home=${jdk} --server=false
             '';
 
