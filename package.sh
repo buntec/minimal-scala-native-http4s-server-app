@@ -2,5 +2,4 @@
 
 scala-cli --power package . \
   -o app \
-  --java-home "$JAVA_HOME" \
-  --native-linking "-static-libstdc++"
+  --java-home "$JAVA_HOME"

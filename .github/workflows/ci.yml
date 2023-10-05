@@ -1,28 +1,23 @@
 name: Continuous Integration
 
-permissions:
-  contents: write
-
 on:
   push:
     branches:
       - main
-    tags:
-      - "v*.*.*"
   pull_request:
     branches:
       - main
 
 jobs:
   check_nix:
-    name: Build and release app
+    name: Build app
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-13]
+        os: [ubuntu-latest, macos-latest]
         include:
           - os: ubuntu-latest
             release_suffix: linux
-          - os: macos-13
+          - os: macos-latest
             release_suffix: macos
 
     runs-on: ${{ matrix.os }}
@@ -36,23 +31,6 @@ jobs:
         uses: DeterminateSystems/flake-checker-action@main
         with:
           fail-mode: true
-
-      - name: Cache maven artifacts
-        uses: actions/cache@v3
-        with:
-          key: ${{ matrix.os }}-coursier-cache
-          path: |
-            ./coursier-cache
-
       - name: Build
         run: |
-          nix develop --command ./package-ci.sh
-      - name: Compress
-        run: |
-          tar czf "app-${{ matrix.release_suffix }}.tar.gz" app
-      - name: Release
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            *.tar.gz
+          nix build
