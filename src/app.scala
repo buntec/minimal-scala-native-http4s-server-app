@@ -1,6 +1,6 @@
 import cats.*
 import cats.effect.*
-import cats.syntax.all.*
+// import cats.syntax.all.*
 import com.comcast.ip4s.*
 import org.http4s.HttpRoutes
 import org.http4s.dsl.Http4sDsl
