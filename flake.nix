@@ -67,7 +67,7 @@
 
           outputHashAlgo = "sha256";
           outputHashMode = "recursive";
-          outputHash = "sha256-D05+u5pW0+OXNeizpZJC97FnYeVp1N+5Gk+SA7xt1zM=";
+          outputHash = "sha256-P45zR9rgo1OC3dci7Mo0cK0r3TFNkPYr0eBvBm2hW/A=";
         };
 
         scala-native-app = pkgs.stdenv.mkDerivation {
@@ -81,13 +81,13 @@
           COURSIER_ARCHIVE_CACHE = "${coursier-cache}/coursier-cache/arc";
           COURSIER_JVM_CACHE = "${coursier-cache}/coursier-cache/jvm";
 
+          # TODO: --native-mode release-full
           buildPhase = ''
             mkdir scala-cli-home
             scala-cli --power \
               package . \
               --native \
               --native-version 0.4.15 \
-              --native-mode release-full \
               --java-home=${jdk} \
               --server=false \
               -o app 
