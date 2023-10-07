@@ -204,7 +204,8 @@
 
         devShell = pkgs.devshell.mkShell {
           name = "scala-native-http4s-dev-shell";
-          commands = [ { package = scala-cli; } { package = sbt; } ];
+          commands =
+            [ { package = scala-cli; } { package = sbt; } { package = node; } ];
           packages = build-packages ++ [ sbt metals ];
           env = [
             {

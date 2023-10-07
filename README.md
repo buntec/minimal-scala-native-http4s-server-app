@@ -1,24 +1,31 @@
-A toy web server written in Scala using [http4s](https://http4s.org/)
-and compiled using [Scala Native](https://scala-native.org/en/latest/) - no JVM :rocket:.
+# A toy web server written in Scala using [http4s](https://http4s.org/)
 
-The build is handled entirely by [scala-cli](https://scala-cli.virtuslab.org/) - no sbt :sunglasses:.
-
-The app is distributed using [nix flakes](https://nixos.wiki/wiki/Flakes) - no brew, apt, appimage, ... :snowflake:.
+The point of this project is to demonstrate how [scala-cli](https://scala-cli.virtuslab.org/)
+and [nix flakes](https://nixos.wiki/wiki/Flakes) can be leveraged to build and distribute
+Scala apps in 4 different ways:
+ - as a standalone jar running on the JVM;
+ - as a native executable compiled by [Scala Native](https://scala-native.org/en/latest/);
+ - as a [GraalVM native image](https://www.graalvm.org/latest/reference-manual/native-image/);
+ - as a Node.js app compiled by [Scala.js](https://www.scala-js.org/).
 
 If you have [nix](https://nixos.org/download.html) installed and [flakes enabled](https://nixos.wiki/wiki/Flakes#Enable_flakes):
 
 ```shell
-nix run github:buntec/minimal-scala-native-http4s-server-app
+nix run github:buntec/minimal-scala-native-http4s-server-app#jvm
+
+nix run github:buntec/minimal-scala-native-http4s-server-app#native
+
+nix run github:buntec/minimal-scala-native-http4s-server-app#graal
+
+nix run github:buntec/minimal-scala-native-http4s-server-app#node
 ```
 
-If you want the actual binary:
-```shell
-nix build github:buntec/minimal-scala-native-http4s-server-app
-./result/bin/app
-```
+Note that running any of the above will be slow the first time only -
+after the initial build everything is cached in your nix store.
 
-For a reproducible dev environment, clone this repo and do
+If you want the actual binary, simply replace `run` by `build`.
 
+This flake also contains a dev shell suitable for working on the app:
 ```shell
-nix develop
+nix develop github:buntec/minimal-scala-native-http4s-server-app
 ```
