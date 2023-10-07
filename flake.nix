@@ -23,6 +23,7 @@
         sbt = pkgs.sbt.override { jre = jdk; };
         metals = pkgs.metals.override { jre = jdk; };
         scala-cli = pkgs.scala-cli.override { jre = jdk; };
+        node = pkgs.nodejs;
 
         build-packages = [
           jdk
@@ -57,6 +58,7 @@
             mkdir -p coursier-cache/arc
             mkdir -p coursier-cache/jvm
             scala-cli compile . --native --native-version 0.4.15 --java-home=${jdk} --server=false
+            scala-cli compile . --js --js-module-kind common --java-home=${jdk} --server=false
             scala-cli compile . --java-home=${jdk} --server=false
           '';
 
@@ -67,7 +69,7 @@
 
           outputHashAlgo = "sha256";
           outputHashMode = "recursive";
-          outputHash = "sha256-P45zR9rgo1OC3dci7Mo0cK0r3TFNkPYr0eBvBm2hW/A=";
+          outputHash = "sha256-fidGzudPWjuW5sXgeCuLU29DlOqOLAVxxAblyCPn+jU=";
         };
 
         scala-native-app = pkgs.stdenv.mkDerivation {
@@ -122,6 +124,43 @@
 
           installPhase = ''
             mkdir -p $out/bin
+            cp app $out/bin
+          '';
+        };
+
+        node-app = pkgs.stdenv.mkDerivation {
+          name = "scala-js-app";
+          src = ./src;
+          buildInputs = build-packages ++ [ node coursier-cache ];
+
+          JAVA_HOME = "${jdk}";
+          SCALA_CLI_HOME = "./scala-cli-home";
+          COURSIER_CACHE = "${coursier-cache}/coursier-cache/v1";
+          COURSIER_ARCHIVE_CACHE = "${coursier-cache}/coursier-cache/arc";
+          COURSIER_JVM_CACHE = "${coursier-cache}/coursier-cache/jvm";
+
+          buildPhase = ''
+            mkdir scala-cli-home
+            scala-cli --power \
+              package . \
+              --js \
+              --js-module-kind common \
+              --java-home=${jdk} \
+              --server=false \
+              -o main.js
+          '';
+
+          # We wrap `main.js` by a simple wrapper script that
+          # essentially invokes `node main.js` - is this a good idea?
+          # Note: the shebang below will be patched by nix
+          installPhase = ''
+            mkdir -p $out/bin
+            cp main.js $out/bin
+            cat << EOF > app
+            #!/usr/bin/env sh
+            ${node}/bin/node $out/bin/main.js
+            EOF
+            chmod +x app
             cp app $out/bin
           '';
         };
@@ -194,6 +233,7 @@
           native = scala-native-app;
           graal = graal-native-image-app;
           jvm = jvm-app;
+          node = node-app;
           default = native;
         };
 
@@ -209,6 +249,10 @@
           jvm = {
             type = "app";
             program = "${jvm-app}/bin/app";
+          };
+          node = {
+            type = "app";
+            program = "${node-app}/bin/app";
           };
           default = native;
         };
