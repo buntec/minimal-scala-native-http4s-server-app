@@ -11,13 +11,13 @@ Scala apps in 4 different ways:
 If you have [nix](https://nixos.org/download.html) installed and [flakes enabled](https://nixos.wiki/wiki/Flakes#Enable_flakes):
 
 ```shell
-nix run github:buntec/minimal-scala-native-http4s-server-app#jvm
+nix run github:buntec/minimal-scala-native-http4s-server-app#jvm --refresh
 
-nix run github:buntec/minimal-scala-native-http4s-server-app#native
+nix run github:buntec/minimal-scala-native-http4s-server-app#native --refresh
 
-nix run github:buntec/minimal-scala-native-http4s-server-app#graal
+nix run github:buntec/minimal-scala-native-http4s-server-app#graal --refresh
 
-nix run github:buntec/minimal-scala-native-http4s-server-app#node
+nix run github:buntec/minimal-scala-native-http4s-server-app#node --refresh
 ```
 
 Note that running any of the above will be slow the first time only -
@@ -27,5 +27,8 @@ If you want the actual binary, simply replace `run` by `build`.
 
 This flake also contains a dev shell suitable for working on the app:
 ```shell
-nix develop github:buntec/minimal-scala-native-http4s-server-app
+nix develop github:buntec/minimal-scala-native-http4s-server-app --refresh
 ```
+
+## Notes
+The `--refresh` flag above ensures that you always get the most recent commit.
